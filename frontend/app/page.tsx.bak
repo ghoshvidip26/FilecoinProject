@@ -1,0 +1,155 @@
+"use client";
+import { useState } from "react";
+import axios from "axios";
+import { ethers } from "ethers";
+import { ABI } from "@/abi";
+
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
+export default function Home() {
+  const [file, setFile] = useState<File | null>(null);
+  const [cid, setCid] = useState("");
+  const [walletAddress, setWalletAddress] = useState("");
+  const [connected, setConnected] = useState(false);
+
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      alert("Please install MetaMask!");
+      return;
+    }
+
+    try {
+      // Check current chain
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const network = await provider.getNetwork();
+
+      // If not Filecoin Calibration (314159), request switch
+      if (network.chainId !== BigInt(314159)) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0x4CB2F" }], // 314159 in hex
+          });
+        } catch (switchError: any) {
+          // If the chain hasn’t been added yet, add it
+          if (switchError.code === 4902) {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [
+                {
+                  chainId: "0x4CB2F", // 314159
+                  chainName: "Filecoin - Calibration Testnet",
+                  rpcUrls: ["https://api.calibration.node.glif.io/rpc/v1"],
+                  blockExplorerUrls: ["https://calibration.filscan.io"],
+                  nativeCurrency: {
+                    name: "tFIL",
+                    symbol: "tFIL",
+                    decimals: 18,
+                  },
+                },
+              ],
+            });
+          } else {
+            throw switchError;
+          }
+        }
+      }
+
+      // Reconnect after switch
+      const signer = await provider.getSigner();
+      const _walletAddress = await signer.getAddress();
+      const contract = new ethers.Contract(
+        process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "",
+        ABI.abi,
+        signer
+      );
+      console.log("Network:", network);
+      console.log("✅ Connected to Filecoin Calibration");
+      console.log("Wallet:", _walletAddress);
+      console.log("Contract:", contract);
+
+      setConnected(true);
+      setWalletAddress(_walletAddress);
+    } catch (err) {
+      console.error("❌ Wallet connection error:", err);
+    }
+  };
+
+  const handleChange = (e: any) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleFilecoinStorage = async () => {
+    const formData = new FormData();
+    if (file) {
+      formData.append("file", file);
+    }
+    const res = await axios.post("https://api.nft.storage/upload/", formData, {
+      headers: {
+        Authorization: "Bearer " + process.env.NEXT_PUBLIC_NFT_STORAGE_API_KEY,
+      },
+    });
+    console.log("CID:", res.data.value.cid);
+  };
+
+  const handleClick = async () => {
+    if (!file) return alert("No file selected!");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await axios.post("http://127.0.0.1:3001/classify", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return (
+    <div className="p-6 flex flex-col items-center justify-center h-screen bg-gray-900">
+      {!connected ? (
+        <button
+          onClick={connectWallet}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Connect Wallet
+        </button>
+      ) : (
+        <>
+          <h2 className="text-2xl text-white mb-4">Upload MRI Scan</h2>
+          <p className="text-gray-400 mb-4">
+            Wallet:{" "}
+            {walletAddress.slice(0, 2) + "..." + walletAddress.slice(-4)}
+          </p>
+          <input type="file" accept="image/*" onChange={handleChange} />
+          {file && (
+            <>
+              <img
+                className="mt-4 w-64 h-64 object-cover"
+                src={URL.createObjectURL(file)}
+              />
+              <button
+                onClick={handleClick}
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg"
+              >
+                Predict
+              </button>
+            </>
+          )}
+          {cid && (
+            <p className="text-green-400 mt-4">✅ Stored with CID: {cid}</p>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
