@@ -25,10 +25,18 @@ export default function PredictionResult({
 }: PredictionResultProps) {
   if (isLoading) {
     return (
-      <div className="w-full p-6 bg-gray-800/50 rounded-xl border border-gray-700">
-        <div className="flex flex-col items-center justify-center py-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-          <p className="text-gray-300">Analyzing MRI scan...</p>
+      <div className="w-full p-8 bg-gray-800/70 backdrop-blur-sm rounded-2xl border border-blue-500/20 shadow-lg">
+        <div className="flex flex-col items-center justify-center py-6">
+          <div className="relative">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+            <div className="absolute top-0 left-0 right-0 bottom-0 animate-pulse rounded-full h-16 w-16 border-2 border-blue-400/20"></div>
+          </div>
+          <p className="text-blue-200 mt-6 font-medium">
+            Analyzing MRI scan...
+          </p>
+          <p className="text-gray-400 text-sm mt-2">
+            This may take a few moments
+          </p>
         </div>
       </div>
     );
@@ -36,9 +44,9 @@ export default function PredictionResult({
 
   if (error) {
     return (
-      <div className="w-full p-6 bg-red-900/20 rounded-xl border border-red-700/50">
-        <div className="flex items-start">
-          <div className="flex-shrink-0">
+      <div className="w-full p-8 bg-red-900/20 backdrop-blur-sm rounded-2xl border border-red-700/30 shadow-lg">
+        <div className="flex items-start space-x-4">
+          <div className="flex-shrink-0 p-2 bg-red-900/30 rounded-lg">
             <svg
               className="h-6 w-6 text-red-400"
               xmlns="http://www.w3.org/2000/svg"
@@ -53,9 +61,11 @@ export default function PredictionResult({
               />
             </svg>
           </div>
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-300">Analysis Error</h3>
-            <div className="mt-2 text-sm text-red-200">
+          <div>
+            <h3 className="text-lg font-semibold text-red-300">
+              Analysis Error
+            </h3>
+            <div className="mt-2 text-red-200/90">
               <p>{error}</p>
             </div>
           </div>
@@ -120,7 +130,7 @@ export default function PredictionResult({
 
   return (
     <div
-      className={`w-full p-6 rounded-xl border transition-all ${
+      className={`w-full p-8 rounded-2xl border transition-all shadow-lg backdrop-blur-sm ${
         colorScheme[resultInfo.severity]
       }`}
     >

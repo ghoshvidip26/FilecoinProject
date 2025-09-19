@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import { ethers } from "ethers";
+import { Loader2 } from "lucide-react"; // lightweight spinner
 
 type WalletButtonProps = {
   onConnect: () => Promise<void>;
@@ -30,9 +29,13 @@ export default function WalletButton({
 
   if (connected) {
     return (
-      <div className="flex items-center gap-2 px-4 py-2 bg-blue-900/30 rounded-full border border-blue-500/30">
-        <div className="h-2 w-2 rounded-full bg-green-400"></div>
-        <span className="text-sm text-gray-300">
+      <div
+        className="flex items-center gap-2 px-4 py-2 rounded-full border border-blue-500/30 
+        bg-gradient-to-r from-blue-700/30 to-indigo-800/30 backdrop-blur-md cursor-default"
+        title={walletAddress}
+      >
+        <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></div>
+        <span className="text-sm font-medium text-gray-200 tracking-wide">
           {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
         </span>
       </div>
@@ -43,11 +46,20 @@ export default function WalletButton({
     <button
       onClick={handleConnect}
       disabled={isLoading}
-      className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800/50 text-white rounded-full transition-all duration-200 ease-in-out"
+      className="flex items-center gap-2 px-5 py-2.5 rounded-full 
+      bg-gradient-to-r from-blue-600 to-indigo-600 
+      hover:from-blue-500 hover:to-indigo-500 
+      disabled:opacity-60 text-white font-medium shadow-lg shadow-blue-500/20 
+      transition-all duration-200 ease-in-out active:scale-95"
     >
-      <span className="text-sm">
-        {isLoading ? "Connecting..." : "Connect Wallet"}
-      </span>
+      {isLoading ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span className="text-sm">Connecting...</span>
+        </>
+      ) : (
+        <span className="text-sm">Connect Wallet</span>
+      )}
     </button>
   );
 }

@@ -16,6 +16,7 @@
     "@lighthouse-web3/sdk": "^0.4.2",
     "ethers": "^6.15.0",
     "filecoin.js": "^0.0.5-alpha",
+    "lucide-react": "^0.544.0",
     "next": "15.5.2",
     "nft.storage": "^7.2.0",
     "react": "19.1.0",

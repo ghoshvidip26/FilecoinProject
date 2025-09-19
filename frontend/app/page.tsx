@@ -7,6 +7,7 @@ import WalletButton from "./components/WalletButton";
 import FileUpload from "./components/FileUpload";
 import PredictionResult from "./components/PredictionResult";
 import Steps from "./components/Steps";
+import lighthouse from "@lighthouse-web3/sdk";
 
 declare global {
   interface Window {
@@ -36,9 +37,15 @@ export default function Home() {
   let currentStep = 1;
   if (connected) currentStep = 2;
   if (file && connected) currentStep = 3;
-  if (prediction && !cid) currentStep = 4;
-  if (cid) currentStep = 4;
+  if (prediction) currentStep = 4;
 
+  const progressCallback = (progressData: any) => {
+    const percentageDone = (
+      (progressData?.uploaded / progressData?.total) *
+      100
+    ).toFixed(2);
+    console.log(percentageDone + "% uploaded");
+  };
   const connectWallet = async () => {
     if (!window.ethereum) {
       setError("Please install MetaMask to connect your wallet.");
@@ -125,18 +132,26 @@ export default function Home() {
     formData.append("file", file);
 
     try {
-      // Make the request to your backend API for classification
-      const res = await axios.post("http://127.0.0.1:3001/classify", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const res = await fetch("http://127.0.0.1:3001/classify", {
+        method: "POST",
+        body: formData,
+      });
+      console.log("Analysis result:", res);
+      const data = await res.json();
+      console.log("Analysis result:", data);
+      setPrediction({
+        result: data.prediction || "Analysis Complete",
+        confidence: data.confidence || null,
+        className: data.prediction,
       });
 
-      setPrediction({
-        result: res.data.class || "Analysis Complete",
-        confidence: res.data.confidence || null,
-        className: res.data.class,
+      const pdfRes = await fetch("http://127.0.0.1:3001/report");
+      const blob = await pdfRes.blob();
+
+      const pdfFile = new File([blob], "report.pdf", {
+        type: "application/pdf",
       });
+      console.log("PDF File:", pdfFile);
     } catch (error: any) {
       console.error("Analysis error:", error);
       setError(
@@ -160,19 +175,15 @@ export default function Home() {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      console.log("Storing file on Filecoin...", file);
 
-      const res = await axios.post(
-        "https://api.nft.storage/upload", // ✅ no trailing slash
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_NFT_STORAGE_API_KEY}`,
-          },
-        }
+      const res = await lighthouse.upload(
+        [file],
+        process.env.NEXT_PUBLIC_LIGHTHOUSE_API!,
+        null,
+        progressCallback
       );
-
-      setCid(res.data.value.cid);
-      console.log("CID:", res.data.value.cid);
+      console.log("File Status:", res);
     } catch (error: any) {
       console.error("Storage error:", error);
       setError(
@@ -292,28 +303,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <footer className="w-full border-t border-gray-800 mt-16 py-8">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
-              © 2025 Brain MRI Analysis Platform
-            </p>
-            <div className="flex items-center space-x-4 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white text-sm">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm">
-                Terms of Service
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm">
-                Contact
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

@@ -26,9 +26,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800`}
       >
-        {children}
+        <main className="min-h-screen relative">
+          {/* Overlay pattern for visual interest */}
+          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+
+          {/* Content container with max-width and padding */}
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+            {children}
+          </div>
+        </main>
       </body>
     </html>
   );

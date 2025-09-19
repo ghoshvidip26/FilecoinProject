@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useRef, useState } from "react";
 
 type FileUploadProps = {
   onFileSelect: (file: File) => void;
@@ -14,26 +13,23 @@ export default function FileUpload({
   file,
   disabled = false,
 }: FileUploadProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
+    if (!disabled) setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragging(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    if (!disabled && e.dataTransfer.files?.length) {
       onFileSelect(e.dataTransfer.files[0]);
     }
   };
@@ -46,19 +42,25 @@ export default function FileUpload({
 
   return (
     <div
-      className={`w-full border-2 border-dashed rounded-xl p-6 transition-colors ${
-        isDragging
-          ? "border-blue-500 bg-blue-500/10"
-          : "border-gray-600 hover:border-gray-500 bg-gray-800/50"
-      } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+      className={`group relative w-full border-2 border-dashed rounded-2xl p-8 transition-all duration-300 
+        ${
+          isDragging
+            ? "border-blue-400 bg-blue-500/10 shadow-lg shadow-blue-500/20 scale-[1.01]"
+            : "border-gray-600 hover:border-gray-400 hover:border-opacity-50 bg-gray-800/50 hover:bg-gray-800/70"
+        } 
+        ${
+          disabled
+            ? "opacity-50 cursor-not-allowed"
+            : "cursor-pointer hover:scale-[1.01] hover:shadow-lg"
+        }
+        backdrop-blur-sm`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      onClick={() =>
-        !disabled && document.getElementById("file-upload")?.click()
-      }
+      onClick={() => !disabled && inputRef.current?.click()}
     >
       <input
+        ref={inputRef}
         id="file-upload"
         type="file"
         accept="image/*"
@@ -77,32 +79,32 @@ export default function FileUpload({
                 className="object-cover w-full h-full"
               />
             </div>
-            <p className="text-sm text-gray-400">{file.name}</p>
+            <p className="text-sm text-gray-400 truncate">{file.name}</p>
           </div>
         ) : (
           <>
-            <div className="p-3 bg-blue-600/20 rounded-full">
+            <div className="p-4 bg-gradient-to-b from-blue-600/20 to-blue-600/10 rounded-2xl group-hover:from-blue-500/30 group-hover:to-blue-600/20 transition-all duration-300">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
+                width="28"
+                height="28"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-blue-400"
+                className="text-blue-400 group-hover:text-blue-300 transition-colors duration-300"
               >
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-white">
+            <h3 className="text-xl font-semibold text-white mt-4 group-hover:text-blue-100 transition-colors duration-300">
               Drag and drop your MRI scan
             </h3>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-400 mt-2 group-hover:text-gray-300 transition-colors duration-300">
               or click to browse (JPEG, PNG, DICOM)
             </p>
           </>
