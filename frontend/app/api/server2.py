@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, url_for
 from langchain_ollama import ChatOllama
 import torch
 import torch.nn as nn
@@ -96,15 +96,18 @@ def classify():
         
         report_path = "report.pdf"
         pdf.output(report_path)
-
-        # Cleanup uploaded image
-        os.remove(file_path)
-
-        # return send_file(report_path, as_attachment=True)
-        return jsonify({"prediction": prediction, "analysis": llm_output})
+        return jsonify({
+            "prediction": prediction,
+            "analysis": llm_output,
+            "report_url": url_for("download_report", _external=True)
+        })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/download_report", methods=["GET"])
+def download_report():
+    return send_file("report.pdf", as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True,port=3001)
