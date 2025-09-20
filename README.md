@@ -1,5 +1,9 @@
-# 🧠 HealthChainAI – Brain Tumor MRI Classifier with Filecoin Storage
-<img width="1536" height="1024" alt="ChatGPT Image Sep 19, 2025, 01_01_09 AM" src="https://github.com/user-attachments/assets/35a3c274-04c1-4a8b-803b-11e9eccf83e9" />
+<img src="https://github.com/user-attachments/assets/35a3c274-04c1-4a8b-803b-11e9eccf83e9" 
+     alt="Brain MRI" 
+     style="height: 40px; vertical-align: middle;">
+<h1 style="display: inline-block; vertical-align: middle; margin-right: 10px;">
+  HealthChainAI – Brain Tumor MRI Classifier with Filecoin Storage
+</h1>
 
 ## 📌 Overview
 
