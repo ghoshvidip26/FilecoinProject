@@ -1,23 +1,27 @@
-import { NFTStorage, File } from "nft.storage";
+import { File } from "nft.storage";
+import lighthouse from "@lighthouse-web3/sdk";
 import fs from "fs";
-
-const NFT_STORAGE_KEY = process.env.NFT_STORAGE_API_KEY || "";
-console.log("NFT_STORAGE_KEY:", NFT_STORAGE_KEY);
+import path from "path";
 
 export async function POST(req: Request) {
-  const client = new NFTStorage({ token: NFT_STORAGE_KEY });
-  const metadata = await client.store({
-    name: "My first NFT",
-    description: "This is my first NFT",
-    image: new File(
-      [new Uint8Array(await fs.promises.readFile("assets/Gemini.png"))],
-      "Gemini.png",
-      { type: "image/png" }
-    ),
-  });
-  console.log("Metadata stored on Filecoin and IPFS with URL:", metadata.url);
-  return new Response(JSON.stringify({ url: metadata.url }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+  const formData = await req.formData();
+  const file = formData.get("file") as File;
+  console.log("Received file:", file);
+  console.log("Formdata: ", formData);
+  console.log("File Name: ", file.name);
+
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  console.log("File Buffer:", buffer);
+
+  const tempPath = path.join("/tmp", file.name);
+  fs.writeFileSync(tempPath, buffer);
+  const uploadResponse = await lighthouse.upload(
+    tempPath,
+    process.env.LIGHTHOUSE_API!
+  );
+  console.log("Upload Response:", uploadResponse);
+  return new Response(
+    "File uploaded successfully: " + JSON.stringify(uploadResponse)
+  );
 }

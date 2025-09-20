@@ -32,6 +32,7 @@ export default function Home() {
   const [isStoring, setIsStoring] = useState(false);
   const [prediction, setPrediction] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   // Calculate the current step based on state
   let currentStep = 1;
@@ -145,13 +146,16 @@ export default function Home() {
         className: data.prediction,
       });
 
-      const pdfRes = await fetch("http://127.0.0.1:3001/report");
+      const pdfRes = await fetch("http://127.0.0.1:3001/download_report");
       const blob = await pdfRes.blob();
+      console.log("Blob: ", blob);
+      console.log("PDF Response:", pdfRes);
 
       const pdfFile = new File([blob], "report.pdf", {
         type: "application/pdf",
       });
       console.log("PDF File:", pdfFile);
+      setPdfFile(pdfFile);
     } catch (error: any) {
       console.error("Analysis error:", error);
       setError(
@@ -164,35 +168,46 @@ export default function Home() {
   };
 
   const handleStoreOnFilecoin = async () => {
-    if (!file) {
+    if (!pdfFile) {
       setError("No file to store.");
       return;
     }
 
     setIsStoring(true);
     setError(null);
+    const formData = new FormData();
+    formData.append("file", pdfFile);
+    console.log("Storing file on Filecoin...", pdfFile);
+    console.log("File: ", pdfFile);
+    console.log("File Name: ", pdfFile.name);
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      console.log("Storing file on Filecoin...", file);
+    const res = await axios.post("/api/nftstore", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    console.log("File stored, response:", res);
+    setIsStoring(false);
 
-      const res = await lighthouse.upload(
-        [file],
-        process.env.NEXT_PUBLIC_LIGHTHOUSE_API!,
-        null,
-        progressCallback
-      );
-      console.log("File Status:", res);
-    } catch (error: any) {
-      console.error("Storage error:", error);
-      setError(
-        error.response?.data?.error ||
-          "Failed to store on Filecoin. Please try again."
-      );
-    } finally {
-      setIsStoring(false);
-    }
+    // try {
+    //   const formData = new FormData();
+    //   formData.append("file", file);
+    //   console.log("Storing file on Filecoin...", file);
+
+    //   const res = await lighthouse.upload(
+    //     [file],
+    //     process.env.NEXT_PUBLIC_LIGHTHOUSE_API!,
+    //     null,
+    //     progressCallback
+    //   );
+    //   console.log("File Status:", res);
+    // } catch (error: any) {
+    //   console.error("Storage error:", error);
+    //   setError(
+    //     error.response?.data?.error ||
+    //       "Failed to store on Filecoin. Please try again."
+    //   );
+    // } finally {
+    //   setIsStoring(false);
+    // }
   };
 
   return (
