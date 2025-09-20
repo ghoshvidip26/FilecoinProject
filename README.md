@@ -1,56 +1,143 @@
-# Brain Tumor classification
-Classifying brain tumor images using a pre-trained deep learning model. The app allows users to upload MRI images and predicts the type of brain tumor present in the image.
+# 🧠 HealthChainAI – Brain Tumor MRI Classifier with Filecoin Storage
 
-## Dataset
+## 📌 Overview
 
-The model is trained on the [Brain Tumor MRI Dataset]([https://www.kaggle.com/datasets/bhaveshmittal/melanoma-cancer-dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset))which consist of 7023 images of human brain MRI images which are classified into 4 classes: glioma - meningioma - no tumor and pituitary.
+**HealthChainAI** is an AI-powered web app for **brain tumor detection and reporting** .
 
-## Model
+- Upload an **MRI scan** .
+- The app predicts the **tumor type** using a **custom-trained CNN model** .
+- A professional **medical-style report** is generated using `alibayram/medgemma` via **Ollama** .
+- The report is stored **permanently on Filecoin** using **Lighthouse SDK** .
 
-The neural network was developed using `nada_ai` from Nillion and was trained to meet size constraints while maintaining robust performance metrics:
+This project bridges **AI in healthcare** with **Web3 decentralized storage** .
 
-|                | Precision | Recall | F1-Score | Support |
-|----------------|-----------|--------|----------|---------|
-| Glioma         | 0.99      | 0.97   | 0.98     | 300     |
-| Meningioma     | 0.97      | 0.97   | 0.97     | 306     |
-| No Tumor       | 0.99      | 1.00   | 0.99     | 405     |
-| Pituitary      | 0.99      | 1.00   | 0.99     | 300     |
-| **Accuracy**   |           |        | 0.99     | 1311    |
-| **Macro Avg**  | 0.99      | 0.98   | 0.98     | 1311    |
-| **Weighted Avg** | 0.99    | 0.99   | 0.99     | 1311    |
+---
 
-**Test Accuracy**: 98.55%
+## ✨ Features
 
-In order to host the model on Nillion one must run the provider.ipynb notebook.
+✅ Upload MRI images through a simple UI
 
-# yet not completed
+✅ Predict tumor type (glioma, meningioma, pituitary, or no tumor)
 
-## Hosting
+✅ Generate detailed **AI-powered medical report**
 
-The model is hosted on the Nillion testnet, and we employ a Streamlit webapp allowing users to upload a brain tumor image and quickly receive a prediction. The service is currently free, with transaction costs on the testnet covered by our wallet.
+✅ Export report as **PDF**
 
-## Usage
+✅ Upload and retrieve reports from **Filecoin**
 
-To use the prediction service, please follow the isntruction on the next step:
+---
 
-### Inference 
+## 🏗️ Architecture
 
-1. Create a virtual environment and activate it:
+```mermaid
+flowchart TD
+    A[User Uploads MRI] --> B[Flask API]
+    B --> C[CNN Model - Tumor Classification]
+    C --> D[Ollama + medgemma - Report Generation]
+    D --> E[PDF Generator]
+    E --> F[Lighthouse SDK - Upload to Filecoin]
+    F --> G[CID Returned to Frontend]
+    G --> H[Next.js UI Shows Report + CID]
 ```
-python -m venv venv
-source venv/bin/activate 
+
+---
+
+## 📂 Dataset
+
+We trained the CNN model on the [Kaggle Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset).
+
+- 4 classes: **glioma** , **meningioma** , **pituitary** , **no tumor**
+- Images preprocessed (resize → normalize → augmentation)
+
+---
+
+## 🧠 Models Used
+
+- **Tumor Classifier** : Custom CNN built in PyTorch.
+- **Report Generator** : [`alibayram/medgemma`](https://ollama.ai/library/alibayram/medgemma) (via Ollama).
+
+---
+
+## ⚡ Tech Stack
+
+- **Frontend** : Next.js + TailwindCSS
+- **Backend** : Flask (Python)
+- **AI** : PyTorch + Ollama
+- **Storage** : Filecoin (via Lighthouse SDK)
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone the repo
+
+```bash
+git clone https://github.com/your-username/healthchainai.git
+cd healthchainai
 ```
 
-2. Install all the required library by:
-```
- pip install -r requirements.txt
- ```
-3. Create an .env file according to `https://docs.nillion.com/network-configuration` and place it inside `/nillion/quickstart/nada_quickstart_programs`
-4. Run the streamlit platfor with:
- ```
- Streamlit run main.py
- ```
-5. Upload an image of a MRI
-6. Receive your prediction.
+### 2️⃣ Backend Setup (Flask + PyTorch)
 
-The image is processed privately without being stored on any server, ensuring user data remains confidential.
+```bash
+cd backend
+pip install -r requirements.txt
+python app.py
+```
+
+- Flask server runs at `http://127.0.0.1:3001`
+
+### 3️⃣ Frontend Setup (Next.js)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+- Next.js app runs at `http://localhost:3000`
+
+### 4️⃣ Environment Variables
+
+Create `.env.local` in `frontend/` with:
+
+```env
+NEXT_PUBLIC_LIGHTHOUSE_API=your_lighthouse_api_key
+```
+
+---
+
+## 📄 Example Flow
+
+1. Upload an MRI image
+2. CNN predicts: `glioma_tumor`
+3. AI Report Generated:
+   - Explanation of glioma
+   - Possible abnormalities
+   - Suggested medical steps
+4. Report saved as `report.pdf`
+5. PDF uploaded to Filecoin → CID returned
+
+---
+
+## 📚 What We Learned
+
+- Training CNNs on **medical imaging datasets**
+- Using **Ollama LLMs (medgemma)** for domain-specific reporting
+- **File handling across Flask → Next.js → Filecoin**
+- Power of combining **AI + Web3 in healthcare**
+
+---
+
+## 🔮 What’s Next
+
+- Radiologist feedback loop for report validation
+- Support for **CT scans, X-rays**
+- Mobile-first deployment
+- Federated learning for privacy-preserving training
+
+---
+
+## 🤝 Contributors
+
+- 👨‍💻 You
+- 🤖 AI Assistants (CNN + medgemma)
