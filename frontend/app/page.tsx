@@ -7,7 +7,6 @@ import WalletButton from "./components/WalletButton";
 import FileUpload from "./components/FileUpload";
 import PredictionResult from "./components/PredictionResult";
 import Steps from "./components/Steps";
-import lighthouse from "@lighthouse-web3/sdk";
 
 declare global {
   interface Window {
@@ -186,28 +185,6 @@ export default function Home() {
     });
     console.log("File stored, response:", res);
     setIsStoring(false);
-
-    // try {
-    //   const formData = new FormData();
-    //   formData.append("file", file);
-    //   console.log("Storing file on Filecoin...", file);
-
-    //   const res = await lighthouse.upload(
-    //     [file],
-    //     process.env.NEXT_PUBLIC_LIGHTHOUSE_API!,
-    //     null,
-    //     progressCallback
-    //   );
-    //   console.log("File Status:", res);
-    // } catch (error: any) {
-    //   console.error("Storage error:", error);
-    //   setError(
-    //     error.response?.data?.error ||
-    //       "Failed to store on Filecoin. Please try again."
-    //   );
-    // } finally {
-    //   setIsStoring(false);
-    // }
   };
 
   return (
@@ -276,26 +253,6 @@ export default function Home() {
                   </button>
                 </div>
               )}
-            </div>
-
-            {/* Information card */}
-            <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700/50">
-              <h3 className="text-lg font-medium mb-2">
-                About Brain Tumor Detection
-              </h3>
-              <p className="text-gray-400 text-sm">
-                This tool uses AI to analyze MRI scans and detect potential
-                brain tumors. The system can identify different types of tumors
-                including glioma, meningioma, and pituitary tumors.
-              </p>
-              <div className="mt-4 bg-blue-900/20 border border-blue-800/30 rounded-lg p-3 text-xs text-blue-300">
-                <p className="font-medium">Important Note</p>
-                <p className="mt-1">
-                  This is a research tool and not intended for clinical
-                  diagnosis. Always consult with healthcare professionals for
-                  medical advice.
-                </p>
-              </div>
             </div>
           </div>
 
