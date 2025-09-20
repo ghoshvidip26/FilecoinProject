@@ -81,17 +81,7 @@ git clone https://github.com/your-username/healthchainai.git
 cd healthchainai
 ```
 
-### 2️⃣ Backend Setup (Flask + PyTorch)
-
-```bash
-cd backend
-pip install -r requirements.txt
-python app.py
-```
-
-- Flask server runs at `http://127.0.0.1:3001`
-
-### 3️⃣ Frontend Setup (Next.js)
+### 2️⃣ Frontend Setup (Next.js)
 
 ```bash
 cd frontend
@@ -101,12 +91,24 @@ npm run dev
 
 - Next.js app runs at `http://localhost:3000`
 
+### 3️⃣ Backend Setup (Flask + PyTorch)
+
+```bash
+cd app/api
+pip3 install -r requirements.txt
+python3 server2.py
+```
+
+- Flask server runs at `http://127.0.0.1:3001`
+
 ### 4️⃣ Environment Variables
 
 Create `.env.local` in `frontend/` with:
 
 ```env
-NEXT_PUBLIC_LIGHTHOUSE_API=your_lighthouse_api_key
+LIGHTHOUSE_API=""
+NEXT_PUBLIC_CONTRACT_ADDRESS=""
+HF_TOKEN=""
 ```
 
 ---
@@ -139,10 +141,4 @@ NEXT_PUBLIC_LIGHTHOUSE_API=your_lighthouse_api_key
 - Support for **CT scans, X-rays**
 - Mobile-first deployment
 - Federated learning for privacy-preserving training
-
 ---
-
-## 🤝 Contributors
-
-- 👨‍💻 You
-- 🤖 AI Assistants (CNN + medgemma)
